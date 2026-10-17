@@ -1,7 +1,6 @@
+const js = require("@eslint/js");
 
-import js from "@eslint/js";
-
-export default [
+module.exports = [
   js.configs.recommended,
   {
     files: ["**/*.js"],
