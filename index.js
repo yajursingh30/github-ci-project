@@ -3,3 +3,4 @@ function add(a, b) {
 }
 
 module.exports = { add };
+// Testing the GitHub Actions CI pipeline
