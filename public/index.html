@@ -1,0 +1,325 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopEasy Lite | Online Shopping</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 22px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 26px;
+        }
+
+        header span {
+            color: #facc15;
+        }
+
+        .cart-count {
+            background: #facc15;
+            color: #172554;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .hero {
+            padding: 55px 8%;
+            background: #dbeafe;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 36px;
+            color: #172554;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            color: #475569;
+            font-size: 17px;
+        }
+
+        .container {
+            padding: 40px 8%;
+        }
+
+        .container h2 {
+            margin-bottom: 25px;
+            color: #172554;
+        }
+
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 22px;
+        }
+
+        .product {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+        }
+
+        .product .emoji {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        .product h3 {
+            margin-bottom: 8px;
+        }
+
+        .category {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .price {
+            color: #1d4ed8;
+            font-weight: bold;
+            font-size: 20px;
+            margin: 15px 0;
+        }
+
+        button {
+            background: #1d4ed8;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #172554;
+        }
+
+        .cart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 35px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .remove-btn {
+            background: #dc2626;
+            padding: 7px 12px;
+        }
+
+        .total {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 22px;
+        }
+
+        .checkout-btn {
+            margin-top: 18px;
+            background: #16a34a;
+        }
+
+        footer {
+            background: #172554;
+            color: white;
+            text-align: center;
+            padding: 22px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 18px 5%;
+            }
+
+            .hero h2 {
+                font-size: 27px;
+            }
+
+            .container {
+                padding: 30px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>ShopEasy <span>Lite</span></h1>
+        <div class="cart-count">
+            🛒 Cart: <span id="cart-count">0</span>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h2>Welcome to ShopEasy Lite!</h2>
+        <p>Your favourite products, at affordable prices.</p>
+    </section>
+
+    <main class="container">
+
+        <h2>Explore Our Products</h2>
+
+        <div class="products" id="products">
+            Loading products...
+        </div>
+
+        <section class="cart-section">
+            <h2>🛒 Your Shopping Cart</h2>
+
+            <div id="cart-items">
+                Your cart is empty.
+            </div>
+
+            <div class="total" id="cart-total">
+                Total: ₹0
+            </div>
+
+            <button class="checkout-btn" onclick="checkout()">
+                Proceed to Checkout
+            </button>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2026 ShopEasy Lite. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let products = [];
+        let cart = [];
+
+        // Fetch products from backend
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+
+                if (!response.ok) {
+                    throw new Error('Unable to load products');
+                }
+
+                products = await response.json();
+                displayProducts();
+
+            } catch (error) {
+                document.getElementById('products').textContent =
+                    'Could not load products. Please refresh the page.';
+            }
+        }
+
+        // Display product catalogue
+        function displayProducts() {
+            const container = document.getElementById('products');
+
+            container.innerHTML = products.map(product => `
+                <div class="product">
+                    <div class="emoji">${product.emoji}</div>
+                    <h3>${product.name}</h3>
+                    <p class="category">${product.category}</p>
+                    <p class="price">₹${product.price}</p>
+                    <button onclick="addToCart(${product.id})">
+                        Add to Cart
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Add product to cart
+        function addToCart(id) {
+            const product = products.find(item => item.id === id);
+
+            if (product) {
+                cart.push(product);
+                updateCart();
+            }
+        }
+
+        // Remove product from cart
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        // Update cart and total
+        function updateCart() {
+            const cartItems = document.getElementById('cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('cart-total');
+
+            cartCount.textContent = cart.length;
+
+            if (cart.length === 0) {
+                cartItems.textContent = 'Your cart is empty.';
+            } else {
+                cartItems.innerHTML = cart.map((item, index) => `
+                    <div class="cart-item">
+                        <span>${item.emoji} ${item.name} - ₹${item.price}</span>
+                        <button class="remove-btn"
+                            onclick="removeFromCart(${index})">
+                            Remove
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            const total = cart.reduce(
+                (sum, item) => sum + item.price, 0
+            );
+
+            cartTotal.textContent = `Total: ₹${total}`;
+        }
+
+        // Checkout summary
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Your shopping cart is empty!');
+                return;
+            }
+
+            const total = cart.reduce(
+                (sum, item) => sum + item.price, 0
+            );
+
+            alert(
+                `Order Summary\n\nItems: ${cart.length}\nTotal: ₹${total}\n\nThank you for shopping with ShopEasy Lite!`
+            );
+        }
+
+        loadProducts();
+    </script>
+
+</body>
+</html>
