@@ -73,14 +73,16 @@ app.get('/api/products/:id', (req, res) => {
     res.json(product);
 });
 
-// Health check
+// Health check with application version
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'OK',
-        application: 'ShopEasy Lite'
+        application: 'ShopEasy Lite',
+        version: process.env.APP_VERSION || 'local'
     });
 });
 
+// Start server
 app.listen(PORT, () => {
     console.log(`ShopEasy Lite running on port ${PORT}`);
 });
