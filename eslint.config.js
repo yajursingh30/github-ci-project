@@ -1,3 +1,4 @@
+
 const js = require("@eslint/js");
 
 module.exports = [
@@ -12,6 +13,8 @@ module.exports = [
         process: "readonly",
         module: "readonly",
         require: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
       },
     },
   },
